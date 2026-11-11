@@ -1,8 +1,4 @@
 package com.campominado.app.game
-
-/**
- * Estado visual de uma única casa do tabuleiro.
- */
 data class CellUiState(
     val row: Int,
     val column: Int,

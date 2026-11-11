@@ -1,9 +1,4 @@
 package com.campominado.app.game
-
-/**
- * Estado completo da tela de jogo.
- * O GameViewModel atualizará este objeto por meio de StateFlow.
- */
 data class GameUiState(
     val board: List<List<CellUiState>> = emptyList(),
     val difficulty: Difficulty = Difficulty.EASY,

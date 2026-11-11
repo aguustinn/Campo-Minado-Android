@@ -1,8 +1,5 @@
 package com.campominado.app.game
 
-/**
- * Dificuldades disponíveis no Campo Minado.
- */
 enum class Difficulty(
     val displayName: String,
     val rows: Int,

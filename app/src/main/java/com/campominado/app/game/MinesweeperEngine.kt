@@ -8,10 +8,6 @@ sealed interface RevealResult {
     data object HitMine : RevealResult
 }
 
-/**
- * Motor independente da interface Android.
- * As minas são posicionadas no primeiro clique para garantir uma primeira jogada segura.
- */
 class MinesweeperEngine(
     private val difficulty: Difficulty,
     private val random: Random = Random.Default
