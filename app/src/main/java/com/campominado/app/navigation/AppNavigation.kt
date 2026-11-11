@@ -26,6 +26,10 @@ import com.campominado.app.MinesweeperScreen
 import com.campominado.app.viewmodel.GameViewModel
 import com.campominado.app.viewmodel.PartidaResultSaver
 import com.campominado.app.viewmodel.PartidaResultado
+import com.campominado.app.ui.HomeScreen
+import com.campominado.app.ui.HistoryScreen
+import com.campominado.app.ui.AdminScreen
+import com.campominado.app.ui.TipsScreen
 
 object AppRoutes {
     const val LOGIN = "login"
@@ -107,11 +111,15 @@ fun AppNavigation() {
             }
 
             composable(AppRoutes.HOME) {
-                PlaceholderScreen(
-                    title = "Tela Inicial",
-                    buttonText = "Começar jogo",
-                    onClick = {
+                HomeScreen(
+                    onPlayClick = {
                         navController.navigate(AppRoutes.GAME)
+                    },
+                    onHistoryClick = {
+                        navController.navigate(AppRoutes.HISTORY)
+                    },
+                    onTipsClick = {
+                        navController.navigate(AppRoutes.TIPS)
                     }
                 )
             }
@@ -125,33 +133,15 @@ fun AppNavigation() {
             }
 
             composable(AppRoutes.HISTORY) {
-                PlaceholderScreen(
-                    title = "Histórico de Partidas",
-                    buttonText = "Voltar ao início",
-                    onClick = {
-                        navController.navigate(AppRoutes.HOME)
-                    }
-                )
+                HistoryScreen()
             }
 
             composable(AppRoutes.ADMIN) {
-                PlaceholderScreen(
-                    title = "Administração",
-                    buttonText = "Voltar ao início",
-                    onClick = {
-                        navController.navigate(AppRoutes.HOME)
-                    }
-                )
+                AdminScreen()
             }
 
             composable(AppRoutes.TIPS) {
-                PlaceholderScreen(
-                    title = "Dicas",
-                    buttonText = "Voltar ao início",
-                    onClick = {
-                        navController.navigate(AppRoutes.HOME)
-                    }
-                )
+                TipsScreen()
             }
         }
     }
