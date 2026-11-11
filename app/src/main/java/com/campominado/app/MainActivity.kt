@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -153,7 +154,7 @@ private fun InfoPanel(label: String, value: String) {
 @Composable
 private fun DifficultySelector(selected: Difficulty, viewModel: GameViewModel) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Difficulty.entries.forEach { difficulty ->
+        Difficulty.values().forEach { difficulty ->
             Button(
                 onClick = { viewModel.selectDifficulty(difficulty) },
                 colors = ButtonDefaults.buttonColors(
@@ -192,6 +193,7 @@ private fun GameBoard(state: GameUiState, viewModel: GameViewModel) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CellButton(
     cell: CellUiState,
