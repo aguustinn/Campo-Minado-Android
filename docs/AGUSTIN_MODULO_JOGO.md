@@ -1,4 +1,4 @@
-# Módulo do jogo — Agustin Brasileiro
+# Módulo do jogo 
 
 ## Responsabilidade
 
