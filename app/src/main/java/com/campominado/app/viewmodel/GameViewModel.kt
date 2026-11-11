@@ -25,6 +25,10 @@ class GameViewModel(
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
+    init {
+        startNewGame()
+    }
+
     fun setPlayerName(name: String) {
         _uiState.update { it.copy(playerName = name.trim().ifBlank { "Jogador" }) }
     }
