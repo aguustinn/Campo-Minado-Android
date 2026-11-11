@@ -41,6 +41,7 @@ import com.campominado.app.game.GameUiState
 import com.campominado.app.viewmodel.GameViewModel
 import com.campominado.app.viewmodel.PartidaResultSaver
 import com.campominado.app.viewmodel.PartidaResultado
+import com.campominado.app.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +52,7 @@ class MainActivity : ComponentActivity() {
                 background = Color(0xFF101820),
                 surface = Color(0xFF1B2833)
             )) {
-                val gameViewModel: GameViewModel = viewModel(
-                    factory = GameViewModelFactory
-                )
-                MinesweeperScreen(gameViewModel)
+                AppNavigation()
             }
         }
     }
@@ -73,7 +71,7 @@ private object GameViewModelFactory : ViewModelProvider.Factory {
 }
 
 @Composable
-private fun MinesweeperScreen(viewModel: GameViewModel) {
+fun MinesweeperScreen(viewModel: GameViewModel) {
     val state by viewModel.uiState.collectAsState()
 
     Surface(
