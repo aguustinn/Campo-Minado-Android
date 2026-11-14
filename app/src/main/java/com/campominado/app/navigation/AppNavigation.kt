@@ -1,20 +1,15 @@
 package com.campominado.app.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -23,17 +18,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.campominado.app.MinesweeperScreen
-import com.campominado.app.viewmodel.GameViewModel
-import com.campominado.app.viewmodel.PartidaResultSaver
-import com.campominado.app.viewmodel.PartidaResultado
-import com.campominado.app.ui.HomeScreen
-import com.campominado.app.ui.HistoryScreen
 import com.campominado.app.ui.AdminScreen
+import com.campominado.app.ui.HistoryScreen
+import com.campominado.app.ui.HomeScreen
 import com.campominado.app.ui.TipsScreen
-import androidx.compose.runtime.remember
-import com.campominado.app.data.repository.NivelRepositoryMemoria
 import com.campominado.app.viewmodel.AdminViewModel
-import com.campominado.app.viewmodel.AdminViewModelFactory
+import com.campominado.app.viewmodel.AppViewModelFactory
+import com.campominado.app.viewmodel.GameViewModel
+import com.campominado.app.viewmodel.HistoryViewModel
 
 object AppRoutes {
     const val LOGIN = "login"
@@ -44,10 +36,7 @@ object AppRoutes {
     const val TIPS = "tips"
 }
 
-private data class NavItem(
-    val route: String,
-    val title: String
-)
+private data class NavItem(val route: String, val title: String)
 
 private val bottomItems = listOf(
     NavItem(AppRoutes.HOME, "Início"),
@@ -60,31 +49,21 @@ private val bottomItems = listOf(
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val nivelRepository = remember {
-        NivelRepositoryMemoria()
-    }
+    val context = LocalContext.current
+    val factory = AppViewModelFactory(context)
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    val showBottomBar = currentRoute != AppRoutes.LOGIN
-
     Scaffold(
         bottomBar = {
-            if (showBottomBar) {
+            if (currentRoute != AppRoutes.LOGIN) {
                 NavigationBar {
                     bottomItems.forEach { item ->
                         NavigationBarItem(
-                            selected = backStackEntry
-                                ?.destination
-                                ?.hierarchy
-                                ?.any { it.route == item.route } == true,
+                            selected = backStackEntry?.destination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
                                 navController.navigate(item.route) {
-                                    popUpTo(
-                                        navController.graph.findStartDestination().id
-                                    ) {
-                                        saveState = true
-                                    }
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -97,102 +76,44 @@ fun AppNavigation() {
             }
         }
     ) { paddingValues ->
-
         NavHost(
             navController = navController,
             startDestination = AppRoutes.LOGIN,
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(AppRoutes.LOGIN) {
-                PlaceholderScreen(
-                    title = "Campo Minado - Login",
-                    buttonText = "Entrar",
-                    onClick = {
+                androidx.compose.foundation.layout.Column(
+                    modifier = Modifier.padding(24.dp),
+                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                ) {
+                    Text("Campo Minado - Login")
+                    androidx.compose.material3.Button(onClick = {
                         navController.navigate(AppRoutes.HOME) {
-                            popUpTo(AppRoutes.LOGIN) {
-                                inclusive = true
-                            }
+                            popUpTo(AppRoutes.LOGIN) { inclusive = true }
                         }
-                    }
-                )
+                    }) { Text("Entrar") }
+                }
             }
-
             composable(AppRoutes.HOME) {
                 HomeScreen(
-                    onPlayClick = {
-                        navController.navigate(AppRoutes.GAME)
-                    },
-                    onHistoryClick = {
-                        navController.navigate(AppRoutes.HISTORY)
-                    },
-                    onTipsClick = {
-                        navController.navigate(AppRoutes.TIPS)
-                    }
+                    onPlayClick = { navController.navigate(AppRoutes.GAME) },
+                    onHistoryClick = { navController.navigate(AppRoutes.HISTORY) },
+                    onTipsClick = { navController.navigate(AppRoutes.TIPS) }
                 )
             }
-
             composable(AppRoutes.GAME) {
-                val gameViewModel: GameViewModel = viewModel(
-                    factory = GameViewModelFactory
-                )
-
-                MinesweeperScreen(viewModel = gameViewModel)
+                val vm: GameViewModel = viewModel(factory = factory)
+                MinesweeperScreen(viewModel = vm)
             }
-
             composable(AppRoutes.HISTORY) {
-                HistoryScreen()
+                val vm: HistoryViewModel = viewModel(factory = factory)
+                HistoryScreen(viewModel = vm)
             }
-
             composable(AppRoutes.ADMIN) {
-                val adminViewModel: AdminViewModel = viewModel(
-                    factory = AdminViewModelFactory(nivelRepository)
-                )
-
-                AdminScreen(adminViewModel = adminViewModel)
+                val vm: AdminViewModel = viewModel(factory = factory)
+                AdminScreen(adminViewModel = vm)
             }
-
-            composable(AppRoutes.TIPS) {
-                TipsScreen()
-            }
+            composable(AppRoutes.TIPS) { TipsScreen() }
         }
-    }
-}
-
-@Composable
-private fun PlaceholderScreen(
-    title: String,
-    buttonText: String,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(PaddingValues(24.dp)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = title)
-
-        Button(
-            onClick = onClick,
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(text = buttonText)
-        }
-    }
-}
-
-private object GameViewModelFactory : androidx.lifecycle.ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : androidx.lifecycle.ViewModel> create(
-        modelClass: Class<T>
-    ): T {
-        val noOpSaver = object : PartidaResultSaver {
-            override suspend fun salvarResultado(resultado: PartidaResultado) {
-                // A integração com Room vai ser feita dps
-            }
-        }
-
-        return GameViewModel(noOpSaver) as T
     }
 }
