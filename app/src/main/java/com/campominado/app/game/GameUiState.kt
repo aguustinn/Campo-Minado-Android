@@ -1,10 +1,12 @@
 package com.campominado.app.game
+
 data class GameUiState(
     val board: List<List<CellUiState>> = emptyList(),
-    val difficulty: Difficulty = Difficulty.EASY,
+    val selectedLevel: GameLevel = GameLevel.defaults().first(),
+    val availableLevels: List<GameLevel> = GameLevel.defaults(),
     val status: GameStatus = GameStatus.READY,
     val elapsedSeconds: Long = 0L,
-    val remainingMines: Int = Difficulty.EASY.mines,
+    val remainingMines: Int = GameLevel.defaults().first().mines,
     val revealedSafeCells: Int = 0,
     val playerName: String = "Jogador",
     val message: String? = null,
