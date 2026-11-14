@@ -1,15 +1,22 @@
 package com.campominado.app.navigation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -82,16 +89,33 @@ fun AppNavigation() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(AppRoutes.LOGIN) {
-                androidx.compose.foundation.layout.Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Text("Campo Minado - Login")
-                    androidx.compose.material3.Button(onClick = {
-                        navController.navigate(AppRoutes.HOME) {
-                            popUpTo(AppRoutes.LOGIN) { inclusive = true }
-                        }
-                    }) { Text("Entrar") }
+                    Text(
+                        text = "CAMPO MINADO",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Bem-vindo! Prepare-se para jogar.",
+                        modifier = Modifier.padding(top = 8.dp),
+                        fontSize = 14.sp
+                    )
+                    Button(
+                        onClick = {
+                            navController.navigate(AppRoutes.HOME) {
+                                popUpTo(AppRoutes.LOGIN) { inclusive = true }
+                            }
+                        },
+                        modifier = Modifier.padding(top = 24.dp)
+                    ) {
+                        Text("Entrar")
+                    }
                 }
             }
             composable(AppRoutes.HOME) {
