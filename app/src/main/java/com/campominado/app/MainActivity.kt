@@ -192,7 +192,7 @@ private fun GameBoard(state: GameUiState, viewModel: GameViewModel) {
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        val calculatedSize = (maxWidth - spacing * (columns - 1)) / columns
+        val calculatedSize = (maxWidth - spacing * (columns - 1).toFloat()) / columns
         val cellSize = calculatedSize.coerceAtMost(37.dp).coerceAtLeast(6.dp)
 
         Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
