@@ -14,9 +14,12 @@ class AppViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
-        modelClass.isAssignableFrom(GameViewModel::class.java) -> GameViewModel(gameRepository)
-        modelClass.isAssignableFrom(HistoryViewModel::class.java) -> HistoryViewModel(gameRepository)
-        modelClass.isAssignableFrom(AdminViewModel::class.java) -> AdminViewModel(adminRepository)
+        modelClass.isAssignableFrom(GameViewModel::class.java) ->
+            GameViewModel(gameRepository, adminRepository)
+        modelClass.isAssignableFrom(HistoryViewModel::class.java) ->
+            HistoryViewModel(gameRepository)
+        modelClass.isAssignableFrom(AdminViewModel::class.java) ->
+            AdminViewModel(adminRepository)
         else -> throw IllegalArgumentException("ViewModel desconhecido: ${modelClass.name}")
     } as T
 }
