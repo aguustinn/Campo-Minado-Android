@@ -1,0 +1,13 @@
+# Android / Gradle
+.gradle/
+**/build/
+local.properties
+*.iml
+
+# Android Studio
+.idea/
+.DS_Store
+
+# Local Firebase configuration (download from Firebase Console)
+app/google-services.json
+app/src/*/google-services.json
