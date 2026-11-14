@@ -58,7 +58,7 @@ class GameViewModel(
     }
 
     fun setPlayerName(name: String) {
-        _uiState.update { it.copy(playerName = name.trim().ifBlank { "Jogador" }) }
+        _uiState.update { it.copy(playerName = name) }
     }
 
     fun selectLevel(level: GameLevel) {
@@ -170,7 +170,7 @@ class GameViewModel(
             try {
                 resultSaver.salvarResultado(
                     PartidaResultado(
-                        jogador = snapshot.playerName,
+                        jogador = snapshot.playerName.trim().ifBlank { "Jogador" },
                         dificuldade = snapshot.selectedLevel.name,
                         tempoSegundos = snapshot.elapsedSeconds,
                         resultado = if (status == GameStatus.WON) "Vitória" else "Derrota"
