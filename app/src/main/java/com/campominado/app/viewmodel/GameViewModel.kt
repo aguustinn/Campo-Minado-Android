@@ -2,7 +2,8 @@ package com.campominado.app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.campominado.app.game.Difficulty
+import com.campominado.app.data.repository.AdminRepository
+import com.campominado.app.game.GameLevel
 import com.campominado.app.game.GameStatus
 import com.campominado.app.game.GameUiState
 import com.campominado.app.game.MinesweeperEngine
@@ -12,13 +13,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GameViewModel(
-    private val resultSaver: PartidaResultSaver
+    private val resultSaver: PartidaResultSaver,
+    private val adminRepository: AdminRepository
 ) : ViewModel() {
-    private var engine = MinesweeperEngine(Difficulty.EASY)
+    private var engine = MinesweeperEngine(8, 8, 10)
     private var timerJob: Job? = null
     private var resultAlreadySaved = false
 
@@ -27,15 +30,42 @@ class GameViewModel(
 
     init {
         startNewGame()
+        viewModelScope.launch {
+            adminRepository.listarNiveis()
+                .catch { erro ->
+                    _uiState.update {
+                        it.copy(errorMessage = erro.message ?: "Não foi possível carregar os níveis cadastrados.")
+                    }
+                }
+                .collect { niveis ->
+                    val personalizados = niveis.map { nivel ->
+                        GameLevel(
+                            id = "custom_${nivel.id}",
+                            name = nivel.nome,
+                            rows = nivel.linhas,
+                            columns = nivel.colunas,
+                            mines = nivel.minas
+                        )
+                    }
+                    val disponiveis = GameLevel.defaults() + personalizados
+                    val nivelAtualAindaExiste = disponiveis.any { it.id == _uiState.value.selectedLevel.id }
+                    _uiState.update { it.copy(availableLevels = disponiveis) }
+                    if (!nivelAtualAindaExiste) {
+                        startNewGame(GameLevel.defaults().first())
+                    }
+                }
+        }
     }
 
     fun setPlayerName(name: String) {
         _uiState.update { it.copy(playerName = name.trim().ifBlank { "Jogador" }) }
     }
 
-    fun selectDifficulty(difficulty: Difficulty) {
+    fun selectLevel(level: GameLevel) {
         if (_uiState.value.status == GameStatus.PLAYING) return
-        startNewGame(difficulty)
+        if (_uiState.value.availableLevels.any { it.id == level.id }) {
+            startNewGame(level)
+        }
     }
 
     fun revealCell(row: Int, column: Int) {
@@ -89,17 +119,17 @@ class GameViewModel(
         }
     }
 
-    fun startNewGame(difficulty: Difficulty = _uiState.value.difficulty) {
+    fun startNewGame(level: GameLevel = _uiState.value.selectedLevel) {
         stopTimer()
-        engine = MinesweeperEngine(difficulty)
+        engine = MinesweeperEngine(level.rows, level.columns, level.mines)
         resultAlreadySaved = false
         _uiState.update {
             it.copy(
                 board = engine.toUiBoard(),
-                difficulty = difficulty,
+                selectedLevel = level,
                 status = GameStatus.READY,
                 elapsedSeconds = 0L,
-                remainingMines = difficulty.mines,
+                remainingMines = level.mines,
                 revealedSafeCells = 0,
                 message = null,
                 isSavingResult = false,
@@ -126,7 +156,7 @@ class GameViewModel(
 
     private fun updateRemainingMines() {
         _uiState.update {
-            it.copy(remainingMines = it.difficulty.mines - engine.flaggedCount)
+            it.copy(remainingMines = it.selectedLevel.mines - engine.flaggedCount)
         }
     }
 
@@ -141,7 +171,7 @@ class GameViewModel(
                 resultSaver.salvarResultado(
                     PartidaResultado(
                         jogador = snapshot.playerName,
-                        dificuldade = snapshot.difficulty.displayName,
+                        dificuldade = snapshot.selectedLevel.name,
                         tempoSegundos = snapshot.elapsedSeconds,
                         resultado = if (status == GameStatus.WON) "Vitória" else "Derrota"
                     )
