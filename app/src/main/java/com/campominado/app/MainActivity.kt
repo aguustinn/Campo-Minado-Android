@@ -1,4 +1,4 @@
-package com.campominado.app
+﻿package com.campominado.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -31,16 +31,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.campominado.app.game.CellUiState
 import com.campominado.app.game.Difficulty
 import com.campominado.app.game.GameStatus
 import com.campominado.app.game.GameUiState
 import com.campominado.app.viewmodel.GameViewModel
-import com.campominado.app.viewmodel.PartidaResultSaver
-import com.campominado.app.viewmodel.PartidaResultado
 import com.campominado.app.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
@@ -55,18 +50,6 @@ class MainActivity : ComponentActivity() {
                 AppNavigation()
             }
         }
-    }
-}
-
-private object GameViewModelFactory : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val noOpSaver = object : PartidaResultSaver {
-            override suspend fun salvarResultado(resultado: PartidaResultado) {
-                // Integração com Room será adicionada pelo módulo responsável pelo banco.
-            }
-        }
-        return GameViewModel(noOpSaver) as T
     }
 }
 
@@ -106,9 +89,9 @@ fun MinesweeperScreen(viewModel: GameViewModel) {
 
             Text(
                 text = when (state.status) {
-                    GameStatus.READY -> "Escolha uma casa para começar"
+                    GameStatus.READY -> "Escolha uma casa para comeÃ§ar"
                     GameStatus.PLAYING -> "Boa sorte!"
-                    GameStatus.WON -> "Você venceu!"
+                    GameStatus.WON -> "VocÃª venceu!"
                     GameStatus.LOST -> "Fim de jogo!"
                 },
                 color = Color(0xFFB9C7D2),
@@ -205,9 +188,9 @@ private fun CellButton(
         else -> Color(0xFF496273)
     }
     val label = when {
-        cell.isFlagged -> "🚩"
+        cell.isFlagged -> "ðŸš©"
         !cell.isRevealed -> ""
-        cell.isMine -> "💣"
+        cell.isMine -> "ðŸ’£"
         cell.adjacentMines == 0 -> ""
         else -> cell.adjacentMines.toString()
     }
