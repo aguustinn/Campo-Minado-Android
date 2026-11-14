@@ -139,11 +139,11 @@
     <string name="default_error_message">"Invalid input"</string>
     <string name="default_popup_window_title" ns2:ignore="ExtraTranslation">"Pop-Up Window"</string>
     <string name="dropdown_menu">"Dropdown menu"</string>
-    <string name="gcm_defaultSenderId" translatable="false">46486596650</string>
-    <string name="google_api_key" translatable="false">AIzaSyBvGnZrbIcD0vUyt7kvj8h_CuN_8mkAZBE</string>
-    <string name="google_app_id" translatable="false">1:46486596650:android:a63495f3860c054f1a6753</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBvGnZrbIcD0vUyt7kvj8h_CuN_8mkAZBE</string>
-    <string name="google_storage_bucket" translatable="false">campo-minado-android.firebasestorage.app</string>
+    <string name="gcm_defaultSenderId" translatable="false">346991272140</string>
+    <string name="google_api_key" translatable="false">AIzaSyDJtWwYGe8VSZzlfZS6HRifvDz2mH3xmlw</string>
+    <string name="google_app_id" translatable="false">1:346991272140:android:0cd2ac66ceb3d264b76269</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDJtWwYGe8VSZzlfZS6HRifvDz2mH3xmlw</string>
+    <string name="google_storage_bucket" translatable="false">campominado-6aba5.firebasestorage.app</string>
     <string name="in_progress">In progress</string>
     <string name="indeterminate">Partially checked</string>
     <string name="m3c_bottom_sheet_collapse_description">Collapse bottom sheet</string>
@@ -209,7 +209,7 @@
     <string name="m3c_tooltip_pane_description">Tooltip</string>
     <string name="navigation_menu">"Navigation menu"</string>
     <string name="not_selected">Not selected</string>
-    <string name="project_id" translatable="false">campo-minado-android</string>
+    <string name="project_id" translatable="false">campominado-6aba5</string>
     <string name="range_end">"Range end"</string>
     <string name="range_start">"Range start"</string>
     <string name="selected">Selected</string>

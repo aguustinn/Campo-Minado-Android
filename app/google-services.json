@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "46486596650",
-    "project_id": "campo-minado-android",
-    "storage_bucket": "campo-minado-android.firebasestorage.app"
+    "project_number": "346991272140",
+    "project_id": "campominado-6aba5",
+    "storage_bucket": "campominado-6aba5.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:46486596650:android:a63495f3860c054f1a6753",
+        "mobilesdk_app_id": "1:346991272140:android:0cd2ac66ceb3d264b76269",
         "android_client_info": {
           "package_name": "com.campominado.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBvGnZrbIcD0vUyt7kvj8h_CuN_8mkAZBE"
+          "current_key": "AIzaSyDJtWwYGe8VSZzlfZS6HRifvDz2mH3xmlw"
         }
       ],
       "services": {
