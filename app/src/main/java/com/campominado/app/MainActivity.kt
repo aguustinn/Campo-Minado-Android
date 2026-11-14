@@ -217,6 +217,7 @@ private fun GameBoard(state: GameUiState, viewModel: GameViewModel) {
 @Composable
 private fun CellButton(
     cell: CellUiState,
+    size: androidx.compose.ui.unit.Dp,
     enabled: Boolean,
     onReveal: () -> Unit,
     onFlag: () -> Unit
@@ -256,7 +257,7 @@ private fun CellButton(
                 text = label,
                 color = if (cell.isRevealed && !cell.isMine) numberColor else Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 15.sp
+                fontSize = (size.value * 0.55f).coerceAtLeast(5f).sp
             )
         }
     }
