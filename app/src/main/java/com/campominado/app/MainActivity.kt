@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
@@ -89,6 +90,16 @@ fun MinesweeperScreen(viewModel: GameViewModel) {
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = state.playerName,
+                onValueChange = viewModel::setPlayerName,
+                label = { Text("Nome do jogador") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
             Spacer(Modifier.height(18.dp))
 
             Row(
