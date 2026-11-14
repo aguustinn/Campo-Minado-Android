@@ -53,4 +53,76 @@ class AdminViewModel(
                 }
         }
     }
+    fun salvarNivel(
+        id: Int? = null,
+        nome: String,
+        tamanho: String,
+        minasTexto: String
+    ) {
+        val nomeValidado = nome.trim()
+        val tamanhoValidado = tamanho.trim()
+        val quantidadeMinas = minasTexto.toIntOrNull()
+
+        if (nomeValidado.isBlank()) {
+            mostrarErro("Informe o nome do nível.")
+            return
+        }
+
+        val dimensoes = tamanhoValidado.lowercase().split("x")
+        val linhas = dimensoes.getOrNull(0)?.trim()?.toIntOrNull()
+        val colunas = dimensoes.getOrNull(1)?.trim()?.toIntOrNull()
+
+        if (dimensoes.size != 2 ||
+            linhas == null || colunas == null ||
+            linhas <= 0 || colunas <= 0
+        ) {
+            mostrarErro("Informe o tamanho no formato 8x8.")
+            return
+        }
+
+        if (quantidadeMinas == null ||
+            quantidadeMinas <= 0 ||
+            quantidadeMinas >= linhas.toLong() * colunas
+        ) {
+            mostrarErro("Quantidade de minas inválida.")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                nivelRepository.salvarNivel(
+                    NivelDados(
+                        id = id ?: 0,
+                        nome = nomeValidado,
+                        tamanho = "${linhas}x${colunas}",
+                        minas = quantidadeMinas
+                    )
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = null,
+                    successMessage = "Nível salvo com sucesso."
+                )
+            } catch (erro: Exception) {
+                mostrarErro(erro.message ?: "Erro ao salvar o nível.")
+            }
+        }
+    }
+    fun excluirNivel(nivel: NivelDados) {
+        viewModelScope.launch {
+            try {
+                nivelRepository.excluirNivel(nivel)
+
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = null,
+                    successMessage = "Nível excluído com sucesso."
+                )
+
+            } catch (erro: Exception) {
+                mostrarErro(
+                    erro.message ?: "Erro ao excluir o nível."
+                )
+            }
+        }
+    }
 }

@@ -14,32 +14,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.campominado.app.viewmodel.AdminViewModel
+import androidx.compose.runtime.LaunchedEffect
 
-private data class Nivel(
-    val id: Int,
-    val nome: String,
-    val tamanho: String,
-    val minas: Int
-)
+
 
 @Composable
-fun AdminScreen() {
+fun AdminScreen(adminViewModel: AdminViewModel) {
+    val uiState by adminViewModel.uiState.collectAsStateWithLifecycle()
     var nome by remember { mutableStateOf("") }
     var tamanho by remember { mutableStateOf("8x8") }
     var minas by remember { mutableStateOf("10") }
-    var proximoId by remember { mutableIntStateOf(4) }
 
-    var niveis by remember {
-        mutableStateOf(
-            listOf(
-                Nivel(1, "Fácil", "8x8", 10),
-                Nivel(2, "Médio", "12x12", 25),
-                Nivel(3, "Difícil", "16x16", 40)
-            )
-        )
-    }
 
     var nivelEmEdicao by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(uiState.successMessage) {
+        if (uiState.successMessage == "Nível salvo com sucesso.") {
+            nome = ""
+            tamanho = "8x8"
+            minas = "10"
+            nivelEmEdicao = null
+
+            adminViewModel.limparMensagens()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -97,37 +97,12 @@ fun AdminScreen() {
 
         Button(
             onClick = {
-                val quantidade = minas.toIntOrNull()
-
-                if (nome.isNotBlank() &&
-                    tamanho.isNotBlank() &&
-                    quantidade != null &&
-                    quantidade > 0
-                ) {
-                    if (nivelEmEdicao == null) {
-                        niveis = niveis + Nivel(
-                            proximoId++,
-                            nome,
-                            tamanho,
-                            quantidade
-                        )
-                    } else {
-                        niveis = niveis.map { nivel ->
-                            if (nivel.id == nivelEmEdicao) {
-                                nivel.copy(
-                                    nome = nome,
-                                    tamanho = tamanho,
-                                    minas = quantidade
-                                )
-                            } else nivel
-                        }
-                    }
-
-                    nome = ""
-                    tamanho = "8x8"
-                    minas = "10"
-                    nivelEmEdicao = null
-                }
+                adminViewModel.salvarNivel(
+                    id = nivelEmEdicao,
+                    nome = nome,
+                    tamanho = tamanho,
+                    minasTexto = minas
+                )
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
@@ -135,6 +110,24 @@ fun AdminScreen() {
             )
         ) {
             Text(if (nivelEmEdicao == null) "Cadastrar nível" else "Salvar alterações")
+        }
+
+        uiState.errorMessage?.let { mensagem ->
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = mensagem,
+                color = Color(0xFFFF8A80)
+            )
+        }
+
+        uiState.successMessage?.let { mensagem ->
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = mensagem,
+                color = Color(0xFF65D6A6)
+            )
         }
 
         Spacer(Modifier.height(24.dp))
@@ -151,7 +144,7 @@ fun AdminScreen() {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(niveis, key = { it.id }) { nivel ->
+            items(uiState.niveis, key = { it.id }) { nivel ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
@@ -188,7 +181,7 @@ fun AdminScreen() {
 
                             TextButton(
                                 onClick = {
-                                    niveis = niveis.filter { it.id != nivel.id }
+                                    adminViewModel.excluirNivel(nivel)
 
                                     if (nivelEmEdicao == nivel.id) {
                                         nivelEmEdicao = null

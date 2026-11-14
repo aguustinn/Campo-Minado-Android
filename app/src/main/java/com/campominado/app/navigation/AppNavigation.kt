@@ -30,6 +30,10 @@ import com.campominado.app.ui.HomeScreen
 import com.campominado.app.ui.HistoryScreen
 import com.campominado.app.ui.AdminScreen
 import com.campominado.app.ui.TipsScreen
+import androidx.compose.runtime.remember
+import com.campominado.app.data.repository.NivelRepositoryMemoria
+import com.campominado.app.viewmodel.AdminViewModel
+import com.campominado.app.viewmodel.AdminViewModelFactory
 
 object AppRoutes {
     const val LOGIN = "login"
@@ -56,6 +60,9 @@ private val bottomItems = listOf(
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val nivelRepository = remember {
+        NivelRepositoryMemoria()
+    }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
@@ -137,7 +144,11 @@ fun AppNavigation() {
             }
 
             composable(AppRoutes.ADMIN) {
-                AdminScreen()
+                val adminViewModel: AdminViewModel = viewModel(
+                    factory = AdminViewModelFactory(nivelRepository)
+                )
+
+                AdminScreen(adminViewModel = adminViewModel)
             }
 
             composable(AppRoutes.TIPS) {
