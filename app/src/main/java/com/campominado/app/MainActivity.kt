@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +19,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,12 +28,16 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.campominado.app.game.GameLevel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,18 +62,6 @@ class MainActivity : ComponentActivity() {
                 AppNavigation()
             }
         }
-    }
-}
-
-private object GameViewModelFactory : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val noOpSaver = object : PartidaResultSaver {
-            override suspend fun salvarResultado(resultado: PartidaResultado) {
-                // Integração com Room será adicionada pelo módulo responsável pelo banco.
-            }
-        }
-        return GameViewModel(noOpSaver) as T
     }
 }
 
@@ -101,7 +96,7 @@ fun MinesweeperScreen(viewModel: GameViewModel) {
             }
 
             Spacer(Modifier.height(16.dp))
-            DifficultySelector(state.difficulty, viewModel)
+            LevelSelector(state.selectedLevel, state.availableLevels, viewModel)
             Spacer(Modifier.height(16.dp))
 
             Text(
@@ -150,41 +145,68 @@ private fun InfoPanel(label: String, value: String) {
 }
 
 @Composable
-private fun DifficultySelector(selected: Difficulty, viewModel: GameViewModel) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Difficulty.values().forEach { difficulty ->
-            Button(
-                onClick = { viewModel.selectDifficulty(difficulty) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selected == difficulty) Color(0xFF168A62) else Color(0xFF334653)
-                ),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
+private fun LevelSelector(
+    selected: GameLevel,
+    levels: List<GameLevel>,
+    viewModel: GameViewModel
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Button(
+            onClick = { expanded = true },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF168A62))
+        ) {
+            Text("Nível: ${selected.name}")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            levels.forEach { level ->
+                DropdownMenuItem(
+                    text = {
+                        Text("${level.name} — ${level.rows}x${level.columns} | ${level.mines} minas")
+                    },
+                    onClick = {
+                        viewModel.selectLevel(level)
+                        expanded = false
+                    }
                 )
-            ) {
-                Text(difficulty.displayName, fontSize = 12.sp)
             }
         }
+        Text(
+            text = "${selected.rows}x${selected.columns} • ${selected.mines} minas",
+            color = Color(0xFFB9C7D2),
+            fontSize = 12.sp
+        )
     }
 }
 
 @Composable
 private fun GameBoard(state: GameUiState, viewModel: GameViewModel) {
-    Column(
+    val columns = state.selectedLevel.columns
+    val spacing = 2.dp
+
+    BoxWithConstraints(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
-        state.board.forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-                row.forEach { cell ->
-                    CellButton(
-                        cell = cell,
-                        enabled = !state.isGameFinished,
-                        onReveal = { viewModel.revealCell(cell.row, cell.column) },
-                        onFlag = { viewModel.toggleFlag(cell.row, cell.column) }
-                    )
+        val calculatedSize = (maxWidth - spacing * (columns - 1)) / columns
+        val cellSize = calculatedSize.coerceAtMost(37.dp).coerceAtLeast(6.dp)
+
+        Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
+            state.board.forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
+                    row.forEach { cell ->
+                        CellButton(
+                            cell = cell,
+                            size = cellSize,
+                            enabled = !state.isGameFinished,
+                            onReveal = { viewModel.revealCell(cell.row, cell.column) },
+                            onFlag = { viewModel.toggleFlag(cell.row, cell.column) }
+                        )
+                    }
                 }
             }
         }
@@ -220,7 +242,7 @@ private fun CellButton(
 
     Surface(
         modifier = Modifier
-            .size(37.dp)
+            .size(size)
             .combinedClickable(
                 enabled = enabled,
                 onClick = onReveal,
