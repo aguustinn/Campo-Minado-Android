@@ -16,6 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.weight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -189,13 +193,20 @@ private fun GameBoard(state: GameUiState, viewModel: GameViewModel) {
     val spacing = 2.dp
 
     BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        val calculatedSize = (maxWidth - spacing * (columns - 1).toFloat()) / columns
-        val cellSize = calculatedSize.coerceAtMost(37.dp).coerceAtLeast(6.dp)
+        val calculatedSize = (maxWidth - spacing * (columns - 1).toFloat()) / columns.toFloat()
+        val cellSize = calculatedSize.coerceAtMost(37.dp).coerceAtLeast(22.dp)
 
-        Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
+        Column(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(spacing)
+        ) {
             state.board.forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
                     row.forEach { cell ->
