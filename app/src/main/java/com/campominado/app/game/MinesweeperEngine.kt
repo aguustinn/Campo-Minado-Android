@@ -9,9 +9,23 @@ sealed interface RevealResult {
 }
 
 class MinesweeperEngine(
-    private val difficulty: Difficulty,
+    private val rows: Int,
+    private val columns: Int,
+    private val mines: Int,
     private val random: Random = Random.Default
 ) {
+    constructor(difficulty: Difficulty, random: Random = Random.Default) : this(
+        rows = difficulty.rows,
+        columns = difficulty.columns,
+        mines = difficulty.mines,
+        random = random
+    )
+
+    init {
+        require(rows > 0 && columns > 0) { "O tabuleiro precisa ter linhas e colunas positivas." }
+        require(mines > 0 && mines < rows * columns) { "A quantidade de minas é inválida." }
+    }
+
     private data class Cell(
         var isMine: Boolean = false,
         var isRevealed: Boolean = false,
@@ -19,28 +33,18 @@ class MinesweeperEngine(
         var adjacentMines: Int = 0
     )
 
-    private val cells = Array(difficulty.rows) {
-        Array(difficulty.columns) { Cell() }
-    }
-
+    private val cells = Array(rows) { Array(columns) { Cell() } }
     private var minesPlaced = false
     private var revealedSafeCells = 0
 
-    val totalSafeCells: Int
-        get() = difficulty.rows * difficulty.columns - difficulty.mines
-
-    val revealedSafeCount: Int
-        get() = revealedSafeCells
-
-    val flaggedCount: Int
-        get() = cells.sumOf { row -> row.count { it.isFlagged } }
+    val totalSafeCells: Int get() = rows * columns - mines
+    val revealedSafeCount: Int get() = revealedSafeCells
+    val flaggedCount: Int get() = cells.sumOf { row -> row.count { it.isFlagged } }
 
     fun reveal(row: Int, column: Int): RevealResult {
         if (!isInside(row, column)) return RevealResult.NoChange
-
         val cell = cells[row][column]
         if (cell.isRevealed || cell.isFlagged) return RevealResult.NoChange
-
         if (!minesPlaced) placeMines(row, column)
 
         if (cell.isMine) {
@@ -61,9 +65,7 @@ class MinesweeperEngine(
     }
 
     fun revealAllMines() {
-        cells.forEach { row ->
-            row.forEach { cell -> if (cell.isMine) cell.isRevealed = true }
-        }
+        cells.forEach { row -> row.forEach { cell -> if (cell.isMine) cell.isRevealed = true } }
     }
 
     fun toUiBoard(): List<List<CellUiState>> =
@@ -82,19 +84,17 @@ class MinesweeperEngine(
 
     private fun placeMines(firstRow: Int, firstColumn: Int) {
         val positions = buildList {
-            for (row in 0 until difficulty.rows) {
-                for (column in 0 until difficulty.columns) {
+            for (row in 0 until rows) {
+                for (column in 0 until columns) {
                     if (row != firstRow || column != firstColumn) add(row to column)
                 }
             }
         }
-
-        positions.shuffled(random).take(difficulty.mines).forEach { (row, column) ->
+        positions.shuffled(random).take(mines).forEach { (row, column) ->
             cells[row][column].isMine = true
         }
-
-        for (row in 0 until difficulty.rows) {
-            for (column in 0 until difficulty.columns) {
+        for (row in 0 until rows) {
+            for (column in 0 until columns) {
                 cells[row][column].adjacentMines = countAdjacentMines(row, column)
             }
         }
@@ -104,17 +104,13 @@ class MinesweeperEngine(
     private fun revealSafeArea(startRow: Int, startColumn: Int) {
         val queue = ArrayDeque<Pair<Int, Int>>()
         queue.add(startRow to startColumn)
-
         while (queue.isNotEmpty()) {
             val (row, column) = queue.removeFirst()
             if (!isInside(row, column)) continue
-
             val cell = cells[row][column]
             if (cell.isRevealed || cell.isFlagged || cell.isMine) continue
-
             cell.isRevealed = true
             revealedSafeCells++
-
             if (cell.adjacentMines == 0) {
                 forEachNeighbor(row, column) { nextRow, nextColumn ->
                     val neighbor = cells[nextRow][nextColumn]
@@ -146,5 +142,5 @@ class MinesweeperEngine(
     }
 
     private fun isInside(row: Int, column: Int): Boolean =
-        row in 0 until difficulty.rows && column in 0 until difficulty.columns
+        row in 0 until rows && column in 0 until columns
 }
