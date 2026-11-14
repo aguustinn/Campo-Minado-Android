@@ -10,13 +10,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-data class AdminUiState(
-    val niveis: List<NivelEntity> = emptyList(),
-    val isLoading: Boolean = true,
-    val errorMessage: String? = null,
-    val successMessage: String? = null
-)
-
 class AdminViewModel(private val repository: AdminRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> = _uiState.asStateFlow()
