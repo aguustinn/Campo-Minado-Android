@@ -24,7 +24,7 @@ fun HistoryScreen(viewModel: HistoryViewModel) {
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(selected = state.dificuldade == null, onClick = { viewModel.filtrarPorDificuldade(null) }, label = { Text("Todas") })
-            listOf("Fácil", "Médio", "Difícil").forEach { nivel ->
+            state.dificuldadesDisponiveis.forEach { nivel ->
                 FilterChip(selected = state.dificuldade == nivel, onClick = { viewModel.filtrarPorDificuldade(nivel) }, label = { Text(nivel) })
             }
         }
