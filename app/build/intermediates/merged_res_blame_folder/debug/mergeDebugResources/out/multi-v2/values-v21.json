@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.campominado.app-mergeDebugResources-2:/values-v21/values-v21.xml",
+            "outputFile": "com.campominado.app-mergeDebugResources-59:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\klebe\\.gradle\\caches\\9.3.0\\transforms\\4a6dd57b158bb5880c65f1f8dfa97f53\\workspace\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\guilh\\.gradle\\caches\\9.3.0\\transforms\\ee16c9b51aabfb830a223ff3a7e633f7\\workspace\\transformed\\core-1.13.1\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",

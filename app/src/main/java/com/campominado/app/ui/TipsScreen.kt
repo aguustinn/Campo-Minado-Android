@@ -14,6 +14,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 private data class Dica(
     val titulo: String,
@@ -23,28 +29,26 @@ private data class Dica(
 
 @Composable
 fun TipsScreen() {
-    val dicas = listOf(
-        Dica(
-            "Comece pelos cantos",
-            "Os cantos podem ser bons pontos para começar a explorar o tabuleiro."
-            , "🎯"),
-        Dica(
-            "Observe os números",
-            "Cada número indica quantas minas existem nas oito casas ao redor dele."
-            , "🔢"),
-        Dica(
-            "Use as bandeiras",
-            "Marque com uma bandeira as casas que você acredita que escondem minas."
-            , "🚩"),
-        Dica(
-            "Não tenha pressa",
-            "Analise os números e as casas vizinhas antes de revelar uma nova posição."
-            , "🧠"),
-        Dica(
-            "Combine informações",
-            "Use os números de casas próximas em conjunto para descobrir posições seguras."
-            , "💡")
-    )
+    var dicas by remember { mutableStateOf<List<Dica>>(emptyList()) }
+    var erro by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("dicas")
+            .get()
+            .addOnSuccessListener { resultado ->
+                dicas = resultado.documents.map { documento ->
+                    Dica(
+                        titulo = documento.getString("titulo") ?: "",
+                        descricao = documento.getString("descricao") ?: "",
+                        emoji = documento.getString("emoji") ?: "💡"
+                    )
+                }
+            }
+            .addOnFailureListener {
+                erro = true
+            }
+    }
 
     Column(
         modifier = Modifier
