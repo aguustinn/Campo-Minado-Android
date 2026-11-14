@@ -15,6 +15,7 @@ data class HistoryUiState(
     val partidas: List<PartidaEntity> = emptyList(),
     val ranking: List<Pair<String, Int>> = emptyList(),
     val dificuldade: String? = null,
+    val dificuldadesDisponiveis: List<String> = listOf("Fácil", "Médio", "Difícil"),
     val ordenarPorTempo: Boolean = false,
     val isLoading: Boolean = true,
     val errorMessage: String? = null
@@ -37,7 +38,15 @@ class HistoryViewModel(private val repository: GameRepository) : ViewModel() {
                     .eachCount()
                     .toList()
                     .sortedByDescending { it.second }
-                filtro.copy(partidas = filtradas, ranking = ranking, isLoading = false)
+                val dificuldades = (listOf("Fácil", "Médio", "Difícil") + partidas.map { it.dificuldade })
+                    .distinct()
+                    .sorted()
+                filtro.copy(
+                    partidas = filtradas,
+                    ranking = ranking,
+                    dificuldadesDisponiveis = dificuldades,
+                    isLoading = false
+                )
             }.catch { erro ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
